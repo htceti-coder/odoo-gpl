@@ -23,7 +23,7 @@ class FleetVehicleModel(models.Model):
             'name': f'Véhicules GPL - {self.name}',
             'type': 'ir.actions.act_window',
             'res_model': 'gpl.vehicle',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('model_id', '=', self.id)],
             'context': {'default_model_id': self.id}
         }

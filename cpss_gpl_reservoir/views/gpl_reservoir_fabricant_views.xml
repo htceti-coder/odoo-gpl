@@ -7,14 +7,14 @@
             <field name="name">gpl.reservoir.fabricant.tree</field>
             <field name="model">gpl.reservoir.fabricant</field>
             <field name="arch" type="xml">
-                <tree string="Fabricants GPL" sample="1">
+                <list string="Fabricants GPL" sample="1">
                     <field name="code"/>
                     <field name="name"/>
                     <field name="country_id"/>
                     <field name="reservoir_count"/>
                     <field name="product_count"/>
                     <field name="active" invisible="1"/>
-                </tree>
+                </list>
             </field>
         </record>
 

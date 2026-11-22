@@ -55,7 +55,7 @@ class ResPartner(models.Model):
             'name': _('Véhicules GPL'),
             'type': 'ir.actions.act_window',
             'res_model': 'gpl.vehicle',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('client_id', '=', self.id)],
             'context': {'default_client_id': self.id}
         }

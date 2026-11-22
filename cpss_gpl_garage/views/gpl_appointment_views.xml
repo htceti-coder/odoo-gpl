@@ -5,7 +5,7 @@
         <field name="name">gpl.appointment.tree</field>
         <field name="model">gpl.appointment</field>
         <field name="arch" type="xml">
-            <tree string="Rendez-vous" decoration-danger="appointment_status == 'overdue'"
+            <list string="Rendez-vous" decoration-danger="appointment_status == 'overdue'"
                   decoration-info="state == 'in_progress'"
                   decoration-success="state == 'completed'"
                   decoration-muted="state in ['cancelled', 'no_show']">
@@ -23,7 +23,7 @@
                        decoration-danger="state in ['cancelled', 'no_show']"/>
                 <field name="appointment_status" column_invisible="True"/>
                 <field name="operation_reference"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -286,11 +286,11 @@
     <record id="action_gpl_appointment" model="ir.actions.act_window">
         <field name="name">Rendez-vous</field>
         <field name="res_model">gpl.appointment</field>
-        <field name="view_mode">kanban,tree,form,calendar</field>
+        <field name="view_mode">kanban,list,form,calendar</field>
         <field name="view_ids" eval="[
             (5, 0, 0),
             (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_gpl_appointment_kanban')}),
-            (0, 0, {'view_mode': 'tree', 'view_id': ref('view_gpl_appointment_tree')}),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_gpl_appointment_tree')}),
             (0, 0, {'view_mode': 'form', 'view_id': ref('view_gpl_appointment_form')}),
             (0, 0, {'view_mode': 'calendar', 'view_id': ref('view_gpl_appointment_calendar')})
         ]"/>

@@ -275,7 +275,7 @@
         <field name="name">gpl.reservoir.testing.tree</field>
         <field name="model">gpl.reservoir.testing</field>
         <field name="arch" type="xml">
-            <tree string="Réépreuves Réservoirs GPL"
+            <list string="Réépreuves Réservoirs GPL"
                   decoration-success="result == 'pass'"
                   decoration-danger="result == 'fail'"
                   decoration-warning="result == 'pending'"
@@ -308,7 +308,7 @@
 
                 <field name="certificate_number" optional="hide"/>
                 <field name="next_test_date" optional="hide"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -510,10 +510,10 @@
     <record id="action_gpl_reservoir_testing" model="ir.actions.act_window">
         <field name="name">Réépreuves Réservoirs GPL</field>
         <field name="res_model">gpl.reservoir.testing</field>
-        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="view_ids" eval="[(5, 0, 0),
                                        (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_gpl_reservoir_testing_kanban')}),
-                                       (0, 0, {'view_mode': 'tree', 'view_id': ref('view_gpl_reservoir_testing_tree')}),
+                                       (0, 0, {'view_mode': 'list', 'view_id': ref('view_gpl_reservoir_testing_tree')}),
                                        (0, 0, {'view_mode': 'form', 'view_id': ref('view_gpl_reservoir_testing_form')})]"/>
         <field name="search_view_id" ref="view_gpl_reservoir_testing_search"/>
         <field name="help" type="html">

@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data noupdate="0">
 
-        <!-- === CATÉGORIES DE SÉCURITÉ GPL === -->
+        <!-- === CATÉGORIE DE SÉCURITÉ GPL === -->
         <record id="module_category_gpl" model="ir.module.category">
             <field name="name">GPL CPSS</field>
             <field name="description">Gestion GPL - Cedar Peak Systems &amp; Solutions</field>
             <field name="sequence">15</field>
+        </record>
+
+        <!-- Odoo 19 : les groupes sont rattachés à un « privilège »
+             (res.groups.privilege), lui-même rattaché à une catégorie. -->
+        <record id="res_groups_privilege_gpl" model="res.groups.privilege">
+            <field name="name">GPL CPSS</field>
+            <field name="category_id" ref="module_category_gpl"/>
         </record>
 
         <!-- === GROUPES D'UTILISATEURS === -->
@@ -14,7 +21,7 @@
         <!-- Utilisateur GPL basique -->
         <record id="group_gpl_user" model="res.groups">
             <field name="name">GPL : Utilisateur</field>
-            <field name="category_id" ref="module_category_gpl"/>
+            <field name="privilege_id" ref="res_groups_privilege_gpl"/>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
             <field name="comment">Peut consulter les données GPL de base</field>
         </record>
@@ -22,7 +29,7 @@
         <!-- Technicien GPL -->
         <record id="group_gpl_technician" model="res.groups">
             <field name="name">GPL : Technicien</field>
-            <field name="category_id" ref="module_category_gpl"/>
+            <field name="privilege_id" ref="res_groups_privilege_gpl"/>
             <field name="implied_ids" eval="[(4, ref('group_gpl_user'))]"/>
             <field name="comment">Peut effectuer les interventions GPL</field>
         </record>
@@ -30,7 +37,7 @@
         <!-- Responsable GPL -->
         <record id="group_gpl_manager" model="res.groups">
             <field name="name">GPL : Responsable</field>
-            <field name="category_id" ref="module_category_gpl"/>
+            <field name="privilege_id" ref="res_groups_privilege_gpl"/>
             <field name="implied_ids" eval="[(4, ref('group_gpl_technician'))]"/>
             <field name="comment">Peut gérer toutes les opérations GPL</field>
         </record>
@@ -38,9 +45,9 @@
         <!-- Administrateur GPL -->
         <record id="group_gpl_admin" model="res.groups">
             <field name="name">GPL : Administrateur</field>
-            <field name="category_id" ref="module_category_gpl"/>
+            <field name="privilege_id" ref="res_groups_privilege_gpl"/>
             <field name="implied_ids" eval="[(4, ref('group_gpl_manager'))]"/>
-            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+            <field name="user_ids" eval="[(4, ref('base.user_admin'))]"/>
             <field name="comment">Accès complet à la configuration GPL</field>
         </record>
 

@@ -63,7 +63,7 @@
 
         <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id">
             <t t-call="cpss_gpl_reports.gpl_report_header"/>
-            <t t-raw="0"/>
+            <t t-out="0"/>
             <t t-call="cpss_gpl_reports.gpl_report_footer"/>
         </div>
     </template>

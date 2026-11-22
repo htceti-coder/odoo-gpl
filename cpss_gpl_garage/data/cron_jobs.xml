@@ -10,11 +10,9 @@
             <field name="code">model.send_daily_technician_emails()</field>
             <field name="interval_number">1</field>
             <field name="interval_type">days</field>
-            <field name="numbercall">-1</field>
             <field name="active">True</field>
             <!-- Tous les jours à 7h00 -->
             <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).replace(hour=7, minute=0, second=0)"/>
-            <field name="doall">False</field>
             <field name="user_id" ref="base.user_admin"/>
         </record>
 
@@ -26,11 +24,9 @@
             <field name="code">model.send_manager_notifications()</field>
             <field name="interval_number">1</field>
             <field name="interval_type">days</field>
-            <field name="numbercall">-1</field>
             <field name="active">True</field>
             <!-- Tous les jours à 8h00 -->
             <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).replace(hour=8, minute=0, second=0)"/>
-            <field name="doall">False</field>
             <field name="user_id" ref="base.user_admin"/>
         </record>
 

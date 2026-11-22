@@ -5,7 +5,7 @@
         <field name="name">gpl.bordereau.tree</field>
         <field name="model">gpl.bordereau</field>
         <field name="arch" type="xml">
-            <tree string="Bordereaux d'envoi" decoration-success="state=='sent'">
+            <list string="Bordereaux d'envoi" decoration-success="state=='sent'">
                 <field name="name"/>
                 <field name="date_creation"/>
                 <field name="date_envoi"/>
@@ -13,7 +13,7 @@
                 <field name="state" widget="badge"
                        decoration-success="state == 'sent'"
                        decoration-info="state == 'draft'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -62,7 +62,7 @@
                                    context="{'create': False, 'edit': False}"
                                    options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"
                                    domain="[('state', '=', 'done'), ('result', '=', 'pass'), ('bordereau_id', 'in', [False, id])]">
-                                <tree delete="false" create="false" edit="false">
+                                <list delete="false" create="false" edit="false">
                                     <field name="name"/>
                                     <field name="vehicle_id"/>
                                     <field name="client_id"/>
@@ -75,7 +75,7 @@
                                             string="Retirer du bordereau"
                                             icon="fa-times"
                                             invisible="parent.state == 'sent'"/>
-                                </tree>
+                                </list>
                             </field>
                             <div class="text-center mt-2" invisible="state == 'sent'">
                                 <button name="action_add_inspections"
@@ -97,7 +97,7 @@
     <record id="action_gpl_bordereau" model="ir.actions.act_window">
         <field name="name">Bordereaux d'envoi</field>
         <field name="res_model">gpl.bordereau</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Créer un nouveau bordereau d'envoi
@@ -110,7 +110,7 @@
         <field name="name">gpl.inspection.bordereau.selection</field>
         <field name="model">gpl.inspection</field>
         <field name="arch" type="xml">
-            <tree string="Sélectionner des contrôles" multi_edit="1">
+            <list string="Sélectionner des contrôles" multi_edit="1">
                 <header>
                     <button name="action_assign_to_bordereau" string="Ajouter au bordereau"
                             type="object" class="btn-primary"/>
@@ -122,7 +122,7 @@
                 <field name="inspection_type"/>
                 <field name="result" widget="badge"/>
                 <field name="state"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -130,7 +130,7 @@
     <record id="action_gpl_inspection_not_sent" model="ir.actions.act_window">
         <field name="name">Contrôles non envoyés</field>
         <field name="res_model">gpl.inspection</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="domain">[('state', '=', 'done'), ('result', '=', 'pass'), ('bordereau_id', '=', False)]</field>
         <field name="context">{'search_default_not_sent': 1}</field>
     </record>

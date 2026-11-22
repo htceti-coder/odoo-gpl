@@ -57,33 +57,17 @@ class ResConfigSettings(models.TransientModel):
         for record in self:
             record.gpl_use_advanced_workflow = not record.gpl_simplified_mode
 
-    @api.model
-    def get_values(self):
-        res = super().get_values()
-
-        # Récupérer les paramètres système
-        params = self.env['ir.config_parameter'].sudo()
-
-        res.update(
-            gpl_reservoir_test_frequency=int(params.get_param('cpss_gpl.reservoir_test_frequency', 5)),
-            gpl_reservoir_max_age=int(params.get_param('cpss_gpl.reservoir_max_age', 15)),
-            gpl_control_periodic=int(params.get_param('cpss_gpl.gpl_control_periodic', 36)),
-            gpl_simplified_mode=params.get_param('cpss_gpl.simplified_mode', True),
-            gpl_notification_test_days=int(params.get_param('cpss_gpl.notification_test_days', 30)),
-        )
-        return res
-
+    # Odoo 19 : les champs dotés de `config_parameter` sont lus (default_get)
+    # et écrits (set_values) automatiquement par la classe de base
+    # res.config.settings — les anciennes surcharges get_values()/set_values()
+    # sont supprimées.
+    #
+    # Note : ir.config_parameter.set_param(False) supprime la clé, ce qui
+    # empêchait gpl_simplified_mode (défaut True) de conserver la valeur
+    # False. On persiste donc une chaîne 'True'/'False' explicite.
     def set_values(self):
         super().set_values()
-
-        # Sauvegarder les paramètres système
-        params = self.env['ir.config_parameter'].sudo()
-
-        params.set_param('cpss_gpl.reservoir_test_frequency', self.gpl_reservoir_test_frequency)
-        params.set_param('cpss_gpl.gpl_control_periodic', self.gpl_control_periodic)
-        params.set_param('cpss_gpl.reservoir_max_age', self.gpl_reservoir_max_age)
-        params.set_param('cpss_gpl.simplified_mode', self.gpl_simplified_mode)
-        params.set_param('cpss_gpl.notification_test_days', self.gpl_notification_test_days)
-
-        # Sauvegarder automatiquement le workflow avancé (inverse du mode simplifié)
-        params.set_param('cpss_gpl.use_advanced_workflow', not self.gpl_simplified_mode)
+        self.env['ir.config_parameter'].sudo().set_param(
+            'cpss_gpl.simplified_mode',
+            'True' if self.gpl_simplified_mode else 'False',
+        )

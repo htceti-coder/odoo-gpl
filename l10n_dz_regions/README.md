@@ -2,7 +2,7 @@
 
 ## Description
 
-This module provides comprehensive management of Algerian administrative regions for Odoo 17.
+This module provides comprehensive management of Algerian administrative regions for Odoo 19.
 
 ## Features
 
@@ -52,4 +52,4 @@ LGPL-3
 
 ## Version
 
-17.0.1.0.0
+19.0.1.0.0

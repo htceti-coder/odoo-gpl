@@ -11,6 +11,5 @@ class GplVehicleTag(models.Model):
     active = fields.Boolean('Actif', default=True)
     description = fields.Text('Description')
 
-    _sql_constraints = [
-        ('name_uniq', 'unique (name)', 'Ce tag existe déjà!')
-    ]
+    # Odoo 19 : _sql_constraints n'est plus supporté → models.Constraint
+    _name_uniq = models.Constraint('unique (name)', "Ce tag existe déjà!")

@@ -88,7 +88,7 @@ class GplBordereau(models.Model):
             'type': 'ir.actions.act_window',
             'name': 'Sélectionner des contrôles',
             'res_model': 'gpl.inspection',
-            'view_mode': 'tree',
+            'view_mode': 'list',
             'target': 'new',
             'domain': [('state', '=', 'done'), ('result', '=', 'pass'), ('bordereau_id', '=', False)],
             'context': {
