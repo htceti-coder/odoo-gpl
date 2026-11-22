@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Services -->
+    <menuitem id="menu_gpl_services"
+              name="🔧 Services"
+              parent="cpss_gpl_garage.menu_gpl_garage_root"
+              sequence="40"/>
+
+    <menuitem id="menu_gpl_installations"
+              name="Installations"
+              parent="menu_gpl_services"
+              action="action_gpl_service_installation_simple"
+              sequence="10"/>
+
+    <menuitem id="menu_gpl_repairs"
+              name="Réparations"
+              parent="menu_gpl_services"
+              action="action_gpl_repair_order"
+              sequence="20"/>
+
+    <!-- Contrôles -->
+    <menuitem id="menu_gpl_controls"
+              name="🛡️ Contrôles"
+              parent="cpss_gpl_garage.menu_gpl_garage_root"
+              sequence="50"/>
+
+    <menuitem id="menu_gpl_inspections"
+              name="Contrôles Techniques"
+              parent="menu_gpl_controls"
+              action="action_gpl_inspection"
+              sequence="10"/>
+
+    <menuitem id="menu_gpl_testing"
+              name="Réépreuves Réservoirs"
+              parent="menu_gpl_controls"
+              action="action_gpl_reservoir_testing"
+              sequence="20"/>
+
+    <!-- Menu principal Bordereaux -->
+    <menuitem id="menu_gpl_bordereau_main"
+              name="📋 Bordereaux"
+              parent="cpss_gpl_garage.menu_gpl_garage_root"
+              sequence="60"/>
+
+    <!-- Sous-menus -->
+    <menuitem id="menu_gpl_bordereau"
+              name="Bordereaux d'envoi"
+              parent="menu_gpl_bordereau_main"
+              action="action_gpl_bordereau"
+              sequence="10"/>
+
+    <menuitem id="menu_gpl_inspection_not_sent"
+              name="Contrôles à envoyer"
+              parent="menu_gpl_bordereau_main"
+              action="action_gpl_inspection_not_sent"
+              sequence="20"/>
+
+</odoo>

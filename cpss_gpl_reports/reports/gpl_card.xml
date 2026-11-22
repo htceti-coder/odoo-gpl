@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action Report -->
+    <record id="action_report_gpl_card" model="ir.actions.report">
+        <field name="name">Carte GPL RECTO</field>
+        <field name="model">gpl.inspection</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">cpss_gpl_reports.report_gpl_card</field>
+        <field name="report_file">cpss_gpl_reports.report_gpl_card</field>
+        <field name="print_report_name">'Carte_GPL_%s' % (object.name)</field>
+        <field name="binding_model_id" ref="cpss_gpl_operations.model_gpl_inspection"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_gpl_card"/>
+    </record>
+
+
+    <!-- Report Template -->
+    <template id="report_gpl_card">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="o">
+                <div class="page" style="font-family: Arial, Arial, sans-serif; font-size: 16px; color: #000; line-height: 1.3; margin: 0; padding: 0;">
+
+                    <style>
+                        /* Base Styles */
+                        table { width: 100%; border: none; border-collapse: collapse; }
+                        td { vertical-align: top; padding: 2px; }
+
+                        /* Typography */
+                        .bold { font-weight: bold; }
+                        .uppercase { text-transform: uppercase; }
+                        .center { text-align: center; }
+                        .justify { text-align: justify; }
+                        .right { text-align: right; }
+                        .underline { text-decoration: underline; }
+
+                        /* Page 1 Specifics */
+                        .visites-table { border: 1px solid #000; margin-top: 10px; }
+                        .visites-table td { border: 1px solid #999; height: 85px; padding: 0 5px; vertical-align: top; font-size: 14px; }
+                        .visites-header { width: 45%; text-align: left; font-weight: bold; }
+
+                        /* Arabic Header */
+                        .ar { font-family: 'Arial', 'Arial', sans-serif; direction: rtl; }
+                    </style>
+
+                    <!-- ======================================================= -->
+                    <!-- PAGE 1: EXTERIEUR (Standard Layout)                    -->
+                    <!-- ======================================================= -->
+                    <table style="width: 100%; border: none;">
+                        <tr style="border: none;">
+                            <!-- LEFT COLUMN: Visites Periodiques -->
+                            <td style="width: 50%; padding-right: 10px; border: none">
+                                <div class="center bold" style="font-size: 20px; margin-top: 10px;">VISITES PERIODIQUES</div>
+                                <div class="center bold" style="font-size: 20px; margin-top: 10px; margin-bottom: 15px;">- 30 mois -</div>
+
+                                <table class="visites-table">
+                                    <tr><td style="width: 55%;"></td><td class="visites-header">Valable jusqu'au :</td></tr>
+                                    <tr><td></td><td class="visites-header">Valable jusqu'au :</td></tr>
+                                    <tr><td></td><td class="visites-header">Valable jusqu'au :</td></tr>
+                                    <tr><td></td><td class="visites-header">Valable jusqu'au :</td></tr>
+                                    <tr><td></td><td class="visites-header">Valable jusqu'au :</td></tr>
+                                    <tr><td></td><td class="visites-header">Valable jusqu'au :</td></tr>
+                                </table>
+                            </td>
+
+                            <!-- RIGHT COLUMN: Official Header -->
+                            <td style="width: 50%; padding-left: 5px;">
+                                <div class="center">
+                                    <div class="ar bold" style="font-size: 20px; margin-top: 10px; margin-bottom: 5px">الجمهورية الجزائرية الديمقراطية الشعبية</div>
+                                    <div class="bold" style="font-size: 15px; margin-bottom: 8px;">REPUBLIQUE ALGERIENNE DEMOCRATIQUE ET POPULAIRE</div>
+
+                                    <div class="bold" style="font-size: 16px; margin-bottom: 15px;">MINISTERE DE L'ENERGIE ET DES MINES</div>
+                                    <br></br>
+                                    <div class="ar bold" style="font-size: 20px; margin-top: 5px;">وزارة الطاقة و المناجم</div>
+                                    <br></br>
+                                    <div class="bold" style="font-size: 18px; margin-top: 15px;">Direction de l'industrie et des mines</div>
+
+                                    <div class="bold" style="font-size: 18px; margin-top: 5px; margin-bottom: 15px;">
+                                        de la wilaya de <span class="uppercase" t-esc="env.company.state_id.name"/>
+                                    </div>
+                                    <br></br>
+                                    <div class="ar bold" style="font-size: 20px; margin-top: 15px;">مديرية الطاقة و المناجم لولاية <span t-esc="env.company.state_id.name_ar"/></div>
+
+                                    <div class="bold" style="font-size: 18px; margin-top: 15px;">
+                                        <span  t-if="env.company.gpl_company_license" t-esc="env.company.gpl_company_license"/>
+
+                                    </div>
+
+                                    <div class="bold" style="font-size: 18px; margin-top: 5px;">
+                                        N° .................. / 20..........
+                                    </div>
+                                    <br></br>
+                                    <div class="bold uppercase" style="font-size: 24px; margin-top: 15px; color: #333;">Autorisation</div>
+
+                                    <div class="bold" style="font-size: 18px; margin-top: 15px;">
+                                        De mise en circulation d'un véhicule<br/><br/>
+                                        avec utilisation du GPL/C
+                                    </div>
+
+                                    <div style="font-size: 18px; margin-top: 15px;">(Décret n°83-496 Du 13 Aout 1983)</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
