@@ -37,13 +37,14 @@ class ResCountryCommune(models.Model):
     country_id = fields.Many2one('res.country', 'Pays', required=True, related='state_id.country_id')
 
     @api.model
-    def _name_search(self, name, args=None, operator='ilike', limit=100, order=None, name_get_uid=None):
-        args = args or []
-        domain = []
+    def name_search(self, name='', domain=None, operator='ilike', limit=100):
+        # Odoo 19 : _name_search() n'existe plus ; name_search() est appelé
+        # directement (dont via web_name_search pour les many2one).
+        domain = list(domain or [])
         if name:
-            domain = ['|', ('name', operator, name), ('code', operator, name)]
-
-        return self._search(domain + args, limit=limit, order=order, access_rights_uid=name_get_uid)
+            domain = ['|', ('name', operator, name), ('code', operator, name)] + domain
+        records = self.search_fetch(domain, ['display_name'], limit=limit)
+        return [(record.id, record.display_name) for record in records.sudo()]
 
     def action_read_commune(self):
         self.ensure_one()
@@ -66,13 +67,14 @@ class ResCountryLocalite(models.Model):
     country_id = fields.Many2one('res.country', 'Pays', required=True, related='state_id.country_id')
 
     @api.model
-    def _name_search(self, name, args=None, operator='ilike', limit=100, order=None, name_get_uid=None):
-        args = args or []
-        domain = []
+    def name_search(self, name='', domain=None, operator='ilike', limit=100):
+        # Odoo 19 : _name_search() n'existe plus ; name_search() est appelé
+        # directement (dont via web_name_search pour les many2one).
+        domain = list(domain or [])
         if name:
-            domain = ['|', ('name', operator, name), ('code', operator, name)]
-
-        return self._search(domain + args, limit=limit, order=order, access_rights_uid=name_get_uid)
+            domain = ['|', ('name', operator, name), ('code', operator, name)] + domain
+        records = self.search_fetch(domain, ['display_name'], limit=limit)
+        return [(record.id, record.display_name) for record in records.sudo()]
 
     def action_read_localite(self):
         self.ensure_one()

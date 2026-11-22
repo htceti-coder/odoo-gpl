@@ -14,7 +14,7 @@ This module provides comprehensive management of Algerian administrative regions
 * Integration with partners, companies, and banks
 * Automatic postal code assignment based on locality
     """,
-    'version': '17.0.1.0.0',
+    'version': '19.0.1.0.0',
     'category': 'Localization',
 
     'company': 'CPSS',
