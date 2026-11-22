@@ -7,7 +7,9 @@
         <!-- Catégorie principale GPL -->
         <record id="product_category_gpl" model="product.category">
             <field name="name">GPL</field>
-            <field name="parent_id" ref="product.product_category_all"/>
+            <!-- Odoo 19 : la catégorie racine "All" (product.product_category_all)
+                 n'existe plus ; la catégorie GPL devient une racine, comme avant
+                 elle reste au premier niveau de la hiérarchie. -->
             <field name="property_cost_method">average</field>
             <field name="property_valuation">real_time</field>
         </record>
