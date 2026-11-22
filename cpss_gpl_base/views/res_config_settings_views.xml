@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- === VUE DE CONFIGURATION GPL === -->
+        <record id="res_config_settings_view_form_gpl" model="ir.ui.view">
+            <field name="name">res.config.settings.form.inherit.gpl</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority">90</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="inside">
+                    <app data-string="GPL CPSS" string="GPL CPSS" name="cpss_gpl_base" groups="cpss_gpl_base.group_gpl_manager">
+
+                        <!-- === PARAMÈTRES WORKFLOW === -->
+
+                        <block title="Workflow et Processus" name="workflow">
+                            
+                            <setting>
+                                <field name="gpl_simplified_mode"/>
+                                <div class="content-group">
+                                    <div class="text-muted">
+                                        <strong>Active l'automatisation complète :</strong><br/>
+                                        • Création automatique des commandes de vente<br/>
+                                        • Livraison automatique des produits stockables<br/>
+                                        • Facturation automatique<br/>
+                                        • Services traités sans gestion de stock
+                                    </div>
+                                </div>
+                            </setting>
+                        </block>
+
+                        <!-- === PARAMÈTRES RÉSERVOIRS === -->
+                        <block title="Gestion des Réservoirs" name="reservoirs" >
+
+                        <setting>
+                            <field name="gpl_reservoir_test_frequency"/>
+                            <div class="content-group">
+                                <div class="text-muted">
+                                    Fréquence des tests de réservoir (en années)
+                                </div>
+                            </div>
+                        </setting>
+
+                        <setting>
+                            <field name="gpl_reservoir_max_age"/>
+                            <div class="content-group">
+                                <div class="text-muted">
+                                    Âge maximum autorisé pour un réservoir (en années)
+                                </div>
+                            </div>
+                        </setting>
+                        </block>
+
+                        <!-- === NOTIFICATIONS === -->
+                        <block title="Notifications et Alertes" name="notifications">
+                        <setting>
+                            <field name="gpl_notification_test_days"/>
+                            <div class="content-group">
+                                <div class="text-muted">
+                                    Nombre de jours avant expiration pour envoyer l'alerte
+                                </div>
+                            </div>
+                        </setting>
+
+                        <setting>
+                            <field name="gpl_control_periodic"/>
+                            <div class="content-group">
+                                <div class="text-muted">
+                                    Nombre de mois pour le Contrôle périodique - triennal
+                                </div>
+                            </div>
+                        </setting>
+                        </block>
+                    </app>
+                </xpath>
+            </field>
+
+    </record>
+
+        <!-- Action principale pour la configuration -->
+        <record id="action_gpl_configuration" model="ir.actions.act_window">
+            <field name="name">Configuration GPL</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'cpss_gpl_base'}</field>
+        </record>
+
+    </data>
+</odoo>
