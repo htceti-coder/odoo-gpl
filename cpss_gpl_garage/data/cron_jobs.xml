@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Tâche cron : Emails quotidiens techniciens -->
+        <record id="cron_daily_technician_emails" model="ir.cron">
+            <field name="name">GPL - Emails quotidiens techniciens</field>
+            <field name="model_id" ref="model_gpl_notification_system"/>
+            <field name="state">code</field>
+            <field name="code">model.send_daily_technician_emails()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active">True</field>
+            <!-- Tous les jours à 7h00 -->
+            <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).replace(hour=7, minute=0, second=0)"/>
+            <field name="doall">False</field>
+            <field name="user_id" ref="base.user_admin"/>
+        </record>
+
+        <!-- Tâche cron : Notifications managers -->
+        <record id="cron_daily_manager_notifications" model="ir.cron">
+            <field name="name">GPL - Notifications quotidiennes managers</field>
+            <field name="model_id" ref="model_gpl_notification_system"/>
+            <field name="state">code</field>
+            <field name="code">model.send_manager_notifications()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active">True</field>
+            <!-- Tous les jours à 8h00 -->
+            <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).replace(hour=8, minute=0, second=0)"/>
+            <field name="doall">False</field>
+            <field name="user_id" ref="base.user_admin"/>
+        </record>
+
+    </data>
+</odoo>

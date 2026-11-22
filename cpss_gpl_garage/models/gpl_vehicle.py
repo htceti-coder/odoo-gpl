@@ -1,0 +1,410 @@
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError, ValidationError
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
+import logging
+
+_logger = logging.getLogger(__name__)
+
+
+class GplVehicle(models.Model):
+    _name = 'gpl.vehicle'
+    _description = 'Véhicule GPL Garage'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _order = 'id desc'
+    _rec_name = 'display_name'
+
+    # === INFORMATIONS DE BASE ===
+    name = fields.Char('Nom véhicule', compute='_compute_name', store=True)
+    display_name = fields.Char('Nom complet', compute='_compute_display_name', store=True)
+    license_plate = fields.Char('Plaque d\'immatriculation', required=True, tracking=True)
+    vin = fields.Char('Numero de serie', tracking=True)
+    vehicle_type_code = fields.Char('Type de véhicule', tracking=True)
+
+    # === INFORMATIONS TECHNIQUES ===
+    model_id = fields.Many2one('fleet.vehicle.model', 'Modèle', required=True, tracking=True)
+    brand_id = fields.Many2one(related='model_id.brand_id', store=True, readonly=True)
+    year = fields.Char('Année', size=4, tracking=True, help="Année de mise en circulation (ex: 2024)")
+    genre = fields.Char('Genre', tracking=True)
+
+    # === CLIENT ET CONTACT ===
+    client_id = fields.Many2one('res.partner', 'Client', required=True, tracking=True,
+                                domain=[('is_company', '=', False)])
+    client_phone = fields.Char(related='client_id.phone', readonly=True)
+    client_mobile = fields.Char(related='client_id.mobile', readonly=True)
+    client_email = fields.Char(related='client_id.email', readonly=True)
+
+    # === PLANNING ET RENDEZ-VOUS ===
+    appointment_ids = fields.One2many(
+        'gpl.appointment',
+        'vehicle_id',
+        string='Rendez-vous'
+    )
+
+    current_appointment_id = fields.Many2one(
+        'gpl.appointment',
+        string='RDV actuel',
+        compute='_compute_current_appointment',
+        store=True
+    )
+
+    # Computed fields for backward compatibility with calendar views
+    appointment_date = fields.Datetime(
+        'Date rendez-vous',
+        compute='_compute_appointment_fields',
+        store=False
+    )
+
+    estimated_duration = fields.Float(
+        'Durée estimée (heures)',
+        compute='_compute_appointment_fields',
+        store=False
+    )
+
+    next_service_type = fields.Selection([
+        ('installation', 'Installation GPL'),
+        ('repair', 'Réparation'),
+        ('inspection', 'Contrôle/Inspection'),
+        ('testing', 'Réépreuve réservoir'),
+    ], string='Type de service', compute='_compute_appointment_fields', store=False)
+
+    # === ASSIGNATION TECHNICIENS ===
+    assigned_technician_ids = fields.Many2many(
+        'hr.employee',
+        string='Techniciens assignés',
+        compute='_compute_appointment_fields',
+        store=False
+    )
+
+    # === STATUT ET WORKFLOW ===
+    status_id = fields.Many2one('gpl.vehicle.status', 'Statut', default=lambda self: self._get_default_status())
+    status_name = fields.Char(
+        'Nom du statut',
+        related='status_id.name',
+        store=False
+    )
+    active = fields.Boolean('Actif', default=True)
+
+    # === TAGS ET CLASSIFICATION ===
+    tag_ids = fields.Many2many('gpl.vehicle.tag', string='Tags')
+
+    # === INFORMATIONS COMPLÉMENTAIRES ===
+    notes = fields.Text('Notes')
+
+    # === INFORMATIONS RESERVOIR ===
+    reservoir_lot_id = fields.Many2one('stock.lot', string="Réservoir installé",
+                                       domain="[('product_id.is_gpl_reservoir', '=', True)]",
+                                       tracking=True)
+
+    # === COMPTEURS POUR SMART BUTTONS ===
+    appointment_count = fields.Integer(
+        string='Nombre de RDV',
+        compute='_compute_appointment_count'
+    )
+
+    # Informations du contrôle
+    date_inspection = fields.Date(
+        string='Date du contrôle',
+        tracking=True
+    )
+
+    date_next_inspection = fields.Date(
+        string='Prochaine inspection',
+        tracking=True
+    )
+
+    image_128 = fields.Image(
+        related='model_id.image_128',
+        readonly=True
+    )
+
+    # === CHAMPS CALCULÉS ===
+    technician_names = fields.Char('Techniciens', compute='_compute_technician_names')
+    is_appointment_today = fields.Boolean('RDV aujourd\'hui', compute='_compute_appointment_flags')
+    is_appointment_tomorrow = fields.Boolean('RDV demain', compute='_compute_appointment_flags')
+    appointment_status = fields.Selection([
+        ('none', 'Aucun RDV'),
+        ('scheduled', 'Planifié'),
+        ('today', 'Aujourd\'hui'),
+        ('overdue', 'En retard'),
+    ], compute='_compute_appointment_status')
+
+    @api.depends('license_plate', 'model_id')
+    def _compute_name(self):
+        for vehicle in self:
+            if vehicle.license_plate and vehicle.model_id:
+                vehicle.name = f"{vehicle.model_id.name} - {vehicle.license_plate}"
+            elif vehicle.license_plate:
+                vehicle.name = vehicle.license_plate
+            else:
+                vehicle.name = "Nouveau véhicule"
+
+    @api.depends('license_plate', 'client_id', 'model_id')
+    def _compute_display_name(self):
+        for vehicle in self:
+            parts = []
+            if vehicle.license_plate:
+                parts.append(vehicle.license_plate)
+            if vehicle.client_id:
+                parts.append(f"({vehicle.client_id.name})")
+            if vehicle.model_id and not vehicle.license_plate:
+                parts.append(vehicle.model_id.name)
+
+            vehicle.display_name = ' '.join(parts) if parts else 'Nouveau véhicule'
+
+    @api.constrains('year')
+    def _check_year(self):
+        """Valider que l'année est au format correct"""
+        for vehicle in self:
+            if vehicle.year:
+                # Vérifier que c'est 4 chiffres
+                if not vehicle.year.isdigit() or len(vehicle.year) != 4:
+                    raise ValidationError(_("L'année doit être composée de 4 chiffres (ex: 2024)"))
+
+                # Vérifier que c'est une année raisonnable
+                year_int = int(vehicle.year)
+                if year_int < 1900 or year_int > 2100:
+                    raise ValidationError(_("L'année doit être entre 1900 et 2100"))
+
+    @api.depends('appointment_ids', 'appointment_ids.state', 'appointment_ids.appointment_date')
+    def _compute_current_appointment(self):
+        """Find the current active appointment for this vehicle"""
+        for vehicle in self:
+            # Get the next scheduled or confirmed appointment
+            current = self.env['gpl.appointment'].search([
+                ('vehicle_id', '=', vehicle.id),
+                ('state', 'in', ['scheduled', 'confirmed', 'in_progress']),
+            ], order='appointment_date asc', limit=1)
+            vehicle.current_appointment_id = current
+
+    @api.depends('current_appointment_id', 'current_appointment_id.appointment_date',
+                 'current_appointment_id.service_type', 'current_appointment_id.estimated_duration',
+                 'current_appointment_id.assigned_technician_ids')
+    def _compute_appointment_fields(self):
+        """Compute appointment fields from current appointment for backward compatibility"""
+        for vehicle in self:
+            if vehicle.current_appointment_id:
+                vehicle.appointment_date = vehicle.current_appointment_id.appointment_date
+                vehicle.next_service_type = vehicle.current_appointment_id.service_type
+                vehicle.estimated_duration = vehicle.current_appointment_id.estimated_duration
+                vehicle.assigned_technician_ids = vehicle.current_appointment_id.assigned_technician_ids
+            else:
+                vehicle.appointment_date = False
+                vehicle.next_service_type = False
+                vehicle.estimated_duration = 2.0
+                vehicle.assigned_technician_ids = False
+
+    @api.depends('assigned_technician_ids')
+    def _compute_technician_names(self):
+        for vehicle in self:
+            if vehicle.assigned_technician_ids:
+                vehicle.technician_names = ', '.join(vehicle.assigned_technician_ids.mapped('name'))
+            else:
+                vehicle.technician_names = ''
+
+    @api.depends('appointment_date')
+    def _compute_appointment_flags(self):
+        today = fields.Date.today()
+        tomorrow = today + timedelta(days=1)
+        for vehicle in self:
+            if vehicle.appointment_date:
+                appointment_date = vehicle.appointment_date.date()
+                vehicle.is_appointment_today = appointment_date == today
+                vehicle.is_appointment_tomorrow = appointment_date == tomorrow
+            else:
+                vehicle.is_appointment_today = False
+                vehicle.is_appointment_tomorrow = False
+
+    @api.depends('appointment_date')
+    def _compute_appointment_status(self):
+        now = fields.Datetime.now()
+        today = fields.Date.today()
+
+        for vehicle in self:
+            if not vehicle.appointment_date:
+                vehicle.appointment_status = 'none'
+            elif vehicle.appointment_date.date() == today:
+                vehicle.appointment_status = 'today'
+            elif vehicle.appointment_date < now:
+                vehicle.appointment_status = 'overdue'
+            else:
+                vehicle.appointment_status = 'scheduled'
+
+    @api.depends('appointment_ids')
+    def _compute_appointment_count(self):
+        for vehicle in self:
+            vehicle.appointment_count = len(vehicle.appointment_ids)
+
+    @api.model
+    def _get_need_inspection_domain(self):
+        """Return domain for vehicles to control dynamically"""
+        days = int(self.env["ir.config_parameter"].sudo().get_param(
+            "cpss_gpl.notification_test_days", 30
+        ))
+        today = fields.Date.context_today(self)
+        limit_date = today + relativedelta(days=days)
+        return [
+            ("date_next_inspection", ">=", today),
+            ("date_next_inspection", "<=", limit_date),
+        ]
+
+    @api.model
+    def action_vehicle_need_inspection(self):
+        """Custom action with dynamic domain"""
+        domain = self._get_need_inspection_domain()
+        return {
+            "name": "Véhicules à contrôler",
+            "type": "ir.actions.act_window",
+            "res_model": "gpl.vehicle",
+            "view_mode": "tree,form,activity",
+            "domain": domain,
+        }
+
+    def _get_default_status(self):
+        """Statut par défaut"""
+        return self.env.ref('cpss_gpl_garage.vehicle_status_nouveau', raise_if_not_found=False)
+
+    def action_start_service(self):
+        """Démarre le service - délègue au rendez-vous actuel"""
+        self.ensure_one()
+
+        if not self.current_appointment_id:
+            raise UserError(_("Aucun rendez-vous actif pour ce véhicule."))
+
+        # Update vehicle status
+        in_progress_status = self.env.ref('cpss_gpl_garage.vehicle_status_en_cours', raise_if_not_found=False)
+        if in_progress_status:
+            self.status_id = in_progress_status
+
+        # Delegate to appointment
+        return self.current_appointment_id.action_start()
+
+    def action_reschedule_appointment(self):
+        """Reprogrammer le service - délègue au rendez-vous actuel"""
+        self.ensure_one()
+
+        if not self.current_appointment_id:
+            raise UserError(_("Aucun rendez-vous actif pour ce véhicule."))
+
+        return self.current_appointment_id.action_reschedule()
+
+    def action_complete_appointment(self):
+        """Termine le rendez-vous - délègue au rendez-vous actuel"""
+        self.ensure_one()
+
+        if not self.current_appointment_id:
+            raise UserError(_("Aucun rendez-vous actif pour ce véhicule."))
+
+        # Update vehicle status
+        completed_status = self.env.ref('cpss_gpl_garage.vehicle_status_termine', raise_if_not_found=False)
+        if completed_status:
+            self.status_id = completed_status
+
+        # Delegate to appointment
+        self.current_appointment_id.action_complete()
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload'
+        }
+
+    def action_annuler(self):
+        """Annuler le rendez-vous - délègue au rendez-vous actuel"""
+        self.ensure_one()
+
+        if not self.current_appointment_id:
+            raise UserError(_("Aucun rendez-vous actif pour ce véhicule."))
+
+        # Update vehicle status
+        annule_status = self.env.ref('cpss_gpl_garage.vehicle_status_annule', raise_if_not_found=False)
+        if annule_status:
+            self.status_id = annule_status
+
+        # Delegate to appointment
+        return self.current_appointment_id.action_cancel()
+
+    def action_view_appointments(self):
+        """Ouvre la liste des rendez-vous du véhicule"""
+        self.ensure_one()
+        return {
+            'name': _('Rendez-vous'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'gpl.appointment',
+            'view_mode': 'tree,form,calendar',
+            'domain': [('vehicle_id', '=', self.id)],
+            'context': {
+                'default_vehicle_id': self.id,
+                'default_client_id': self.client_id.id,
+            }
+        }
+
+    # === CONTRAINTES ===
+    @api.constrains('license_plate')
+    def _check_license_plate(self):
+        for vehicle in self:
+            if vehicle.license_plate:
+                # Vérifier l'unicité
+                existing = self.search([
+                    ('license_plate', '=', vehicle.license_plate),
+                    ('id', '!=', vehicle.id)
+                ])
+                if existing:
+                    raise ValidationError(_("Cette plaque d'immatriculation existe déjà!"))
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        """Override pour forcer l'affichage de toutes les colonnes de statuts dans kanban"""
+        result = super().read_group(domain, fields, groupby, offset, limit, orderby, lazy)
+
+        # Si groupé par status_id
+        if groupby and len(groupby) > 0 and 'status_id' in groupby[0]:
+            # Récupérer tous les statuts actifs
+            all_statuses = self.env['gpl.vehicle.status'].search([('active', '=', True)], order='sequence, name')
+
+            # Extraire les IDs de statut déjà présents dans les résultats
+            existing_status_ids = []
+            for group in result:
+                if group.get('status_id') and isinstance(group['status_id'], (list, tuple)):
+                    existing_status_ids.append(group['status_id'][0])
+
+            # Ajouter les statuts manquants avec un count de 0
+            for status in all_statuses:
+                if status.id not in existing_status_ids:
+                    # Créer un groupe vide pour ce statut
+                    empty_group = {
+                        'status_id': (status.id, status.name),
+                        'status_id_count': 0,
+                        '__domain': [('status_id', '=', status.id)] + domain,
+                    }
+
+                    # Ajouter les autres champs nécessaires selon le groupby
+                    for field in fields:
+                        if field not in empty_group and field != 'status_id':
+                            empty_group[field] = 0 if 'count' in field else False
+
+                    result.append(empty_group)
+
+            # Trier les résultats par séquence des statuts
+            def sort_key(group):
+                if group.get('status_id') and isinstance(group['status_id'], (list, tuple)):
+                    status_id = group['status_id'][0]
+                    status = self.env['gpl.vehicle.status'].browse(status_id)
+                    return (status.sequence, status.name)
+                return (999, '')
+
+            result.sort(key=sort_key)
+
+        return result
+
+class GplVehicleStatus(models.Model):
+    _name = 'gpl.vehicle.status'
+    _description = 'Statut du Véhicule GPL'
+    _order = 'sequence, name'
+
+    name = fields.Char('Nom', required=True)
+    sequence = fields.Integer('Séquence', default=10)
+    fold = fields.Boolean('Plié dans Kanban', default=False)
+    active = fields.Boolean('Actif', default=True)
+    description = fields.Text('Description')
+    color = fields.Integer('Couleur', default=0)
+    is_done = fields.Boolean('Étape finale', default=False)
