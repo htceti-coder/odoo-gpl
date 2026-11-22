@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <!-- Bouton véhicules GPL -->
-            <xpath expr="//div[@name='button_box']/button[1]" position="before">
+            <xpath expr="//div[@name='button_box']" position="inside">
                 <button string="Véhicules GPL"
                         name="action_view_gpl_vehicles"
                         type="object"
@@ -32,13 +32,13 @@
                     </group>
 
                     <field name="gpl_vehicle_ids" readonly="1">
-                        <tree string="Véhicules GPL">
+                        <list string="Véhicules GPL">
                             <field name="license_plate"/>
                             <field name="model_id"/>
                             <field name="next_service_type"/>
                             <field name="appointment_date"/>
                             <field name="status_id"/>
-                        </tree>
+                        </list>
                     </field>
                 </page>
             </notebook>

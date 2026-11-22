@@ -15,8 +15,8 @@
                         <!-- === PARAMÈTRES WORKFLOW === -->
 
                         <block title="Workflow et Processus" name="workflow">
-                            
-                            <setting>
+
+                            <setting id="gpl_simplified_mode">
                                 <field name="gpl_simplified_mode"/>
                                 <div class="content-group">
                                     <div class="text-muted">
@@ -33,7 +33,7 @@
                         <!-- === PARAMÈTRES RÉSERVOIRS === -->
                         <block title="Gestion des Réservoirs" name="reservoirs" >
 
-                        <setting>
+                        <setting id="gpl_reservoir_test_frequency">
                             <field name="gpl_reservoir_test_frequency"/>
                             <div class="content-group">
                                 <div class="text-muted">
@@ -42,7 +42,7 @@
                             </div>
                         </setting>
 
-                        <setting>
+                        <setting id="gpl_reservoir_max_age">
                             <field name="gpl_reservoir_max_age"/>
                             <div class="content-group">
                                 <div class="text-muted">
@@ -54,7 +54,7 @@
 
                         <!-- === NOTIFICATIONS === -->
                         <block title="Notifications et Alertes" name="notifications">
-                        <setting>
+                        <setting id="gpl_notification_test_days">
                             <field name="gpl_notification_test_days"/>
                             <div class="content-group">
                                 <div class="text-muted">
@@ -63,7 +63,7 @@
                             </div>
                         </setting>
 
-                        <setting>
+                        <setting id="gpl_control_periodic">
                             <field name="gpl_control_periodic"/>
                             <div class="content-group">
                                 <div class="text-muted">
@@ -79,12 +79,13 @@
     </record>
 
         <!-- Action principale pour la configuration -->
+        <!-- Odoo 19 : la valeur « inline » a été supprimée de ir.actions.act_window.target -->
         <record id="action_gpl_configuration" model="ir.actions.act_window">
             <field name="name">Configuration GPL</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">res.config.settings</field>
             <field name="view_mode">form</field>
-            <field name="target">inline</field>
+            <field name="target">current</field>
             <field name="context">{'module' : 'cpss_gpl_base'}</field>
         </record>
 

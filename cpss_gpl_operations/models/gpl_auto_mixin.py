@@ -1,5 +1,6 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from odoo.tools import str2bool
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -29,8 +30,17 @@ class GplAutoDocumentMixin(models.AbstractModel):
     ], string='État Workflow', default='draft', readonly=True)
 
     def _is_simplified_mode(self):
-        """Vérifie si le mode simplifié est activé"""
-        return self.env['ir.config_parameter'].sudo().get_param('cpss_gpl.simplified_mode', True)
+        """Vérifie si le mode simplifié est activé (défaut : True).
+
+        Odoo 19 : cpss_gpl_base persiste le paramètre sous forme de chaîne
+        'True'/'False' (set_param(False) supprime la clé, donc un booléen ne
+        peut pas y être stocké). Une chaîne 'False' étant truthy en Python,
+        on la parse explicitement avec str2bool — le même parsing que celui
+        utilisé par res.config.settings pour relire le champ.
+        """
+        value = self.env['ir.config_parameter'].sudo().get_param(
+            'cpss_gpl.simplified_mode', True)
+        return str2bool(value, True)
 
     def _create_automatic_sale_order(self):
         """Crée automatiquement la commande de vente"""

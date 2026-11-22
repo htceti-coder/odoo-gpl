@@ -56,7 +56,7 @@
                         </page>
                         <page string="Pièces utilisées">
                             <field name="repair_line_ids">
-                                <tree editable="bottom">
+                                <list editable="bottom">
                                     <field name="product_id"
                                            options="{'no_create': True}"/>
                                     <field name="name"/>
@@ -76,7 +76,7 @@
                                     <field name="tax_rate"/>
                                     <field name="subtotal" widget="monetary" readonly="1"/>
                                     <field name="subtotal_ttc" widget="monetary" readonly="1"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="Solution">
@@ -104,7 +104,7 @@
         <field name="name">gpl.repair.order.tree</field>
         <field name="model">gpl.repair.order</field>
         <field name="arch" type="xml">
-            <tree string="Ordres de Réparation" decoration-danger="priority=='2'"
+            <list string="Ordres de Réparation" decoration-danger="priority=='2'"
                   decoration-warning="priority=='1'" decoration-success="state=='done'"
                   decoration-muted="state=='cancel'">
                 <field name="name"/>
@@ -120,7 +120,7 @@
                        decoration-info="state == 'in_progress'"
                        decoration-warning="state == 'planned'"
                        decoration-muted="state == 'cancel'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -285,7 +285,7 @@
     <record id="action_gpl_repair_order" model="ir.actions.act_window">
         <field name="name">Réparations GPL</field>
         <field name="res_model">gpl.repair.order</field>
-        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="context">{'search_default_this_month': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

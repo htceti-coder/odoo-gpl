@@ -270,7 +270,7 @@ class GplReservoirDashboard(models.TransientModel):
             'type': 'ir.actions.act_window',
             'name': _('Réservoirs GPL'),
             'res_model': 'stock.lot',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': domain,
             'context': {
                 'search_default_is_gpl_reservoir': 1,
@@ -297,7 +297,7 @@ class GplReservoirDashboard(models.TransientModel):
             'type': 'ir.actions.act_window',
             'name': _('Réservoirs Expirés'),
             'res_model': 'stock.lot',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': domain,
             'context': {
                 'search_default_is_gpl_reservoir': 1,
@@ -323,7 +323,7 @@ class GplReservoirDashboard(models.TransientModel):
             'type': 'ir.actions.act_window',
             'name': _('Réservoirs Expirant Bientôt'),
             'res_model': 'stock.lot',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': domain,
             'context': {
                 'search_default_is_gpl_reservoir': 1,

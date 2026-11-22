@@ -73,7 +73,7 @@ class GplVehicleOverride(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('Installations - %s') % self.license_plate,
             'res_model': 'gpl.service.installation',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('vehicle_id', '=', self.id)],
             'context': {'default_vehicle_id': self.id},
         }
@@ -85,7 +85,7 @@ class GplVehicleOverride(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('Réparations - %s') % self.license_plate,
             'res_model': 'gpl.repair.order',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('vehicle_id', '=', self.id)],
             'context': {'default_vehicle_id': self.id},
         }
@@ -97,7 +97,7 @@ class GplVehicleOverride(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('Contrôles - %s') % self.license_plate,
             'res_model': 'gpl.inspection',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('vehicle_id', '=', self.id)],
             'context': {'default_vehicle_id': self.id},
         }
@@ -109,7 +109,7 @@ class GplVehicleOverride(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('Tests Réservoir - %s') % self.license_plate,
             'res_model': 'gpl.reservoir.testing',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('vehicle_id', '=', self.id)],
             'context': {'default_vehicle_id': self.id},
         }
@@ -335,7 +335,7 @@ class GplVehicleOperationsWizard(models.TransientModel):
             'type': 'ir.actions.act_window',
             'name': 'Installations',
             'res_model': 'gpl.service.installation',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('vehicle_id', '=', self.vehicle_id.id)],
         }
 
@@ -344,7 +344,7 @@ class GplVehicleOperationsWizard(models.TransientModel):
             'type': 'ir.actions.act_window',
             'name': 'Réparations',
             'res_model': 'gpl.repair.order',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('vehicle_id', '=', self.vehicle_id.id)],
         }
 
@@ -353,7 +353,7 @@ class GplVehicleOperationsWizard(models.TransientModel):
             'type': 'ir.actions.act_window',
             'name': 'Contrôles',
             'res_model': 'gpl.inspection',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('vehicle_id', '=', self.vehicle_id.id)],
         }
 
@@ -362,6 +362,6 @@ class GplVehicleOperationsWizard(models.TransientModel):
             'type': 'ir.actions.act_window',
             'name': 'Tests réservoir',
             'res_model': 'gpl.reservoir.testing',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('vehicle_id', '=', self.vehicle_id.id)],
         }

@@ -1,7 +1,5 @@
 {
     'name': 'CPSS GPL - Opérations & Services',
-    'version': '1.0.0',
-    'category': 'Services/GPL',
     'summary': 'Gestion simplifiée des opérations GPL : installations, réparations et contrôles',
     'description': """
 CPSS GPL - Module Opérations & Services
@@ -26,7 +24,7 @@ Caractéristiques principales :
     'author': 'Cedar Peak Systems & Solutions (CPSS)',
     'website': 'https://cedarpss.com/',
     'category': 'Industries/Automotive',
-    'version': '17.0.1.0.0',
+    'version': '19.0.1.0.0',
     'license': 'LGPL-3',
 
     # Dépendances

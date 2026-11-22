@@ -256,7 +256,7 @@ class GplVehicle(models.Model):
             "name": "Véhicules à contrôler",
             "type": "ir.actions.act_window",
             "res_model": "gpl.vehicle",
-            "view_mode": "tree,form,activity",
+            "view_mode": "list,form,activity",
             "domain": domain,
         }
 
@@ -330,7 +330,7 @@ class GplVehicle(models.Model):
             'name': _('Rendez-vous'),
             'type': 'ir.actions.act_window',
             'res_model': 'gpl.appointment',
-            'view_mode': 'tree,form,calendar',
+            'view_mode': 'list,form,calendar',
             'domain': [('vehicle_id', '=', self.id)],
             'context': {
                 'default_vehicle_id': self.id,

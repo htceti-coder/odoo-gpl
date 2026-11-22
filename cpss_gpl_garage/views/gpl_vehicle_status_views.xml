@@ -5,14 +5,14 @@
         <field name="name">gpl.vehicle.status.tree</field>
         <field name="model">gpl.vehicle.status</field>
         <field name="arch" type="xml">
-            <tree string="Statuts Véhicules GPL" editable="bottom">
+            <list string="Statuts Véhicules GPL" editable="bottom">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="color" widget="color_picker"/>
                 <field name="fold"/>
                 <field name="is_done"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
 

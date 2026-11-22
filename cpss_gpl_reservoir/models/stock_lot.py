@@ -309,9 +309,12 @@ class StockLot(models.Model):
             }
         }
 
-    def name_get(self):
+    # Odoo 19 : name_get() n'est plus appelé par le framework (remplacé par
+    # _compute_display_name). On convertit en conservant le formatage exact.
+    @api.depends('name', 'is_gpl_reservoir', 'fabricant_id', 'capacity',
+                 'reservoir_status')
+    def _compute_display_name(self):
         """Personnalise l'affichage du nom"""
-        result = []
         for lot in self:
             name = lot.name
             if lot.is_gpl_reservoir:
@@ -328,8 +331,7 @@ class StockLot(models.Model):
                         'too_old': '⚠'
                     }
                     name += f" {status_labels.get(lot.reservoir_status, '')}"
-            result.append((lot.id, name))
-        return result
+            lot.display_name = name
 
     @api.model
     def get_reservoir_dashboard_data(self):

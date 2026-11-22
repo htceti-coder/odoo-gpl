@@ -93,7 +93,7 @@
                 </xpath>
 
                 <!-- Ajouter badges GPL -->
-                <xpath expr="//div[@class='oe_kanban_details']" position="inside">
+                <xpath expr="//main" position="inside">
                     <div class="o_kanban_record_bottom mb-2">
                         <span t-if="record.is_gpl_reservoir.raw_value" class="badge badge-primary">
                             <i class="fa fa-flask"/> Réservoir
@@ -147,7 +147,7 @@
                 </xpath>
 
                 <!-- Ajouter filtres GPL -->
-                <xpath expr="//filter[@name='consumable']" position="after">
+                <xpath expr="//filter[@name='goods']" position="after">
                     <separator/>
                     <filter name="is_gpl_reservoir" string="Réservoirs GPL" domain="[('is_gpl_reservoir', '=', True)]"/>
                     <filter name="is_gpl_component" string="Composants GPL" domain="[('is_gpl_component', '=', True)]"/>
@@ -155,8 +155,8 @@
                 </xpath>
 
                 <!-- Ajouter groupes GPL -->
-                <xpath expr="//group[@expand='1']" position="after">
-                <group expand="0" string="Regroupement GPL">
+                <xpath expr="//group" position="after">
+                <group string="Regroupement GPL">
                     <filter name="group_fabricant" string="Fabricant GPL" context="{'group_by': 'gpl_fabricant_id'}"/>
                     <filter name="group_gpl_type" string="Type GPL" context="{'group_by': 'is_gpl_reservoir'}"/>
                 </group>

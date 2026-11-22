@@ -88,7 +88,7 @@
     <record id="action_gpl_clients" model="ir.actions.act_window">
         <field name="name">Clients GPL</field>
         <field name="res_model">res.partner</field>
-        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('is_gpl_client', '=', True)]</field>
         <field name="context">{
             'search_default_customer': 1,
@@ -118,7 +118,7 @@
     <record id="action_gpl_vehicle_status" model="ir.actions.act_window">
         <field name="name">Statuts Véhicules</field>
         <field name="res_model">gpl.vehicle.status</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <menuitem id="menu_gpl_garage_vehicle_status"

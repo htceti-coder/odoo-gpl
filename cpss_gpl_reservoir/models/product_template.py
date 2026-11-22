@@ -159,7 +159,7 @@ class ProductTemplate(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('Lots GPL - %s') % self.name,
             'res_model': 'stock.lot',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('product_id', 'in', self.product_variant_ids.ids)],
             'context': {
                 'default_product_id': self.product_variant_ids[0].id if self.product_variant_ids else False,
@@ -211,7 +211,7 @@ class ProductProduct(models.Model):
         #     'type': 'ir.actions.act_window',
         #     'name': _('Lots Réservoirs - %s') % self.name,
         #     'res_model': 'stock.lot',
-        #     'view_mode': 'tree,form',
+        #     'view_mode': 'list,form',
         #     'domain': [('product_id', '=', self.id)],
         #     'context': {
         #         'default_product_id': self.id,

@@ -27,7 +27,7 @@
     'author': 'Cedar Peak Systems & Solutions (CPSS)',
     'website': 'https://cedarpss.com/',
     'category': 'Industries/Automotive',
-    'version': '17.0.1.0.0',
+    'version': '19.0.1.0.0',
     'license': 'LGPL-3',
 
     # Dépendances de base

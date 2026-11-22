@@ -81,10 +81,12 @@ class GplReservoirFabriquant(models.Model):
     )
 
     # === CONTRAINTES ===
-    _sql_constraints = [
-        ('code_unique', 'UNIQUE(code)', 'Le code fabricant doit être unique !'),
-        ('name_unique', 'UNIQUE(name)', 'Le nom du fabricant doit être unique !'),
-    ]
+    # Odoo 19 : _sql_constraints n'est plus supporté → models.Constraint
+    # (les noms de contraintes en base sont identiques à l'ancien format).
+    _code_unique = models.Constraint(
+        'UNIQUE(code)', "Le code fabricant doit être unique !")
+    _name_unique = models.Constraint(
+        'UNIQUE(name)', "Le nom du fabricant doit être unique !")
 
     @api.constrains('code')
     def _check_code_format(self):
@@ -131,21 +133,26 @@ class GplReservoirFabriquant(models.Model):
 
         return super().write(vals)
 
-    def name_get(self):
+    # Odoo 19 : name_get() n'est plus appelé par le framework (remplacé par
+    # _compute_display_name). On convertit en conservant le formatage exact.
+    @api.depends('name', 'code', 'country_id')
+    def _compute_display_name(self):
         """Personnalise l'affichage du nom"""
-        result = []
         for record in self:
             name = f"[{record.code}] {record.name}"
             if record.country_id:
                 name += f" ({record.country_id.code})"
-            result.append((record.id, name))
-        return result
+            record.display_name = name
 
     @api.model
-    def name_search(self, name='', args=None, operator='ilike', limit=100):
-        """Recherche améliorée sur nom et code"""
-        if args is None:
-            args = []
+    def name_search(self, name='', domain=None, operator='ilike', limit=100):
+        """Recherche améliorée sur nom et code
+
+        Odoo 19 : le second paramètre de name_search s'appelle `domain`
+        (était `args` en 17) et est appelé par mots-clés côté web.
+        """
+        if domain is None:
+            domain = []
 
         if name:
             # Ajouter domaine de recherche sur nom et code
@@ -154,10 +161,10 @@ class GplReservoirFabriquant(models.Model):
                 ('name', operator, name),
                 ('code', operator, name.upper())
             ]
-            args += search_domain
+            domain += search_domain
 
         # Utiliser la recherche standard avec le domaine modifié
-        return super().name_search(name='', args=args, operator=operator, limit=limit)
+        return super().name_search(name='', domain=domain, operator=operator, limit=limit)
 
     def action_view_reservoirs(self):
         """Affiche les réservoirs de ce fabricant"""
@@ -182,7 +189,7 @@ class GplReservoirFabriquant(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('Produits de %s') % self.name,
             'res_model': 'product.template',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('gpl_fabricant_id', '=', self.id)],
             'context': {
                 'default_gpl_fabricant_id': self.id,
